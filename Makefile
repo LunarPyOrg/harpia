@@ -7,5 +7,5 @@ all:
 	@cp token_sample.ini ${HOME}/.config/harpia/token.ini
 
 uninstall:
-	@rm -rf ${DESTDIR}${PREFIX}/bin/harpia
+	@rm  ${DESTDIR}${PREFIX}/bin/harpia
 	@rm -rf ${HOME}/.config/harpia/
