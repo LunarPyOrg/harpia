@@ -5,6 +5,12 @@ Foca principalmente em repositórios do Github
 
 ![Python Ver](https://img.shields.io/badge/Python-3.10-blue?style=flat-square)
 
+
+## Importante
+É necessário utilizar um token do github dentro de token.ini (com acesso à repositórios livres) para que o harpia funcione.
+Caso faça o executável, seria interessante copiar o `token.ini` para `~/.config/harpia/token.ini`
+
+
 ### Uso
 > utilizando python diretamente
 ```sh
