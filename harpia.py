@@ -113,11 +113,12 @@ class GTools():
 
 
     def install_sh(repo):
+        console = Console()
         splited_r = repo.split('/')[1]
         GTools.clone(repo, f"/tmp/{splited_r}")
         
 
-        ras = input(f"[bold white]Run with SUDO? [N/y] [/bold white]")
+        ras = console.input(f"[bold white]Run with SUDO? [N/y] [/bold white]")
         print(f"[bold green]\n[INFO][/bold green] [bold white]STARTING INSTALL.SH\n[/bold white]")
 
         if ras.lower().endswith('n') or ras == "":
@@ -176,6 +177,7 @@ class Harpia(object):
         print(f"[bold]Installing: {' '.join(args)}[/bold]")
 
         for x in args:
+            console = Console()
             if "/" in x:
                 if VerificationTools.verify_repo_existence(x) == True:
                     if VerificationTools.has_install_sh(x) == True:
@@ -183,11 +185,11 @@ class Harpia(object):
                         GTools.install_sh(x)
 
                     elif VerificationTools.has_makefile(x):
-                        confirm = input(f"[bold blue] -> [/bold blue] [bold]`install.sh` not found, but `Makefile` exists. Continue? [Y/n] [/bold]")
+                        confirm = console.input(f"[bold blue] -> [/bold blue] [bold]`install.sh` not found, but `Makefile` exists. Continue? [Y/n] [/bold]")
                         
 
                         if confirm.lower().endswith("y") or confirm == "":
-                            execute_makeinstall = input(f"[bold]Execute with `make install`? [N/y] [/bold]")
+                            execute_makeinstall = console.input(f"[bold]Execute with `make install`? [N/y] [/bold]")
                             if execute_makeinstall.lower().endswith("n") or confirm == "":
                                 makeinstall_tf = False
                             else:
