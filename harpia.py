@@ -4,7 +4,8 @@ import sys
 import subprocess
 from github import Github
 from configparser import ConfigParser
-from rich import print 
+from rich import print
+from rich.console import Console
 
 #GLOBAL
 USER_SHELL = os.environ['SHELL']
@@ -205,12 +206,13 @@ class Harpia(object):
                         
 
                     else:
-                        confirm = input(f"[bold yellow] -> [/bold yellow] [bold]This package has not `install.sh`. Continue? [Y/n] [/bold]")
+                        console = Console()
+                        confirm = console.input(f"[bold yellow] -> [/bold yellow] [bold]This package has not `install.sh`. Continue? [Y/n] [/bold]")
                         if confirm.lower().endswith("y") or confirm == "":
                             print("Okay")
                             GTools.showFiles(x)
 
-                            confirmation_clone_to_tmp = input(f"{BOLD} Clone to /tmp/{x.split('/')[1]}? [Y/n] {CLEAR_ALL}")
+                            confirmation_clone_to_tmp = console.input(f"[bold] Clone to /tmp/{x.split('/')[1]}? [Y/n] [bold]")
                             if confirmation_clone_to_tmp.lower().endswith('y') == True or confirmation_clone_to_tmp == "":
                                 print("Okay")
                                 GTools.installModified(x)
