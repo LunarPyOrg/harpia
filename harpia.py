@@ -13,19 +13,23 @@ from rich.console import Console
 USER_SHELL = os.environ['SHELL']
 USER_HOME = os.environ['HOME']
 
+console: Console = Console()
+
+#  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
+
+def touchConfigFile() -> None:
+    with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
+        config_file.write('[token]\ntoken=')
+
 # Parser automation
-if os.path.exists(f'{USER_HOME}/.config/harpia/token.ini') == True:    
-    parser = ConfigParser()
-    parser.read(f"{USER_HOME}/.config/harpia/token.ini")
+if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
+    console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
+    console.print('[black on cyan] INFO [/] :: Creating the config file\n', style='cyan')
+    touchConfigFile()
+    sys.exit(1)
 
-else:
-    if os.path.exists('./token.ini') == True:
-        parser = ConfigParser()
-        parser.read('./token.ini')
-
-    else:
-        print("couldn't find `token.ini`")
-        sys.exit(1)
+parser = ConfigParser()
+parser.read(f"{USER_HOME}/.config/harpia/token.ini")
 
 
 github_token = parser.get('token', 'token')
