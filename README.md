@@ -8,7 +8,7 @@ Foca principalmente em repositórios do Github
 ### Uso
 > utilizando python diretamente
 ```sh
-harpia <search ou install> package
+$ python3 harpia.py <search ou install> package
 ```
 
 
