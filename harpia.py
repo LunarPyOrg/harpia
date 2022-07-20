@@ -1,23 +1,10 @@
 import fire
 import os
 import sys
+import subprocess
 from github import Github
 from configparser import ConfigParser
-from colorama import Fore, Style
-
-# COLORS CONFS
-BOLD = Style.BRIGHT
-DIM = Style.DIM
-RED = Fore.RED
-GREEN = Fore.GREEN
-BLUE = Fore.BLUE
-YELLOW = Fore.YELLOW
-WHITE = Fore.WHITE
-
-
-CLEAR_FORE = Fore.RESET
-CLEAR_ALL = Style.RESET_ALL
-
+from rich import print 
 
 #GLOBAL
 USER_SHELL = os.environ['SHELL']
@@ -35,7 +22,7 @@ else:
 
     else:
         print("couldn't find `token.ini`")
-        sys.exit()
+        sys.exit(1)
 
 
 github_token = parser.get('token', 'token')
@@ -80,9 +67,9 @@ class GTools():
         try:
             print("Okay")
             if folder == "./":
-                os.system(f"git clone https://github.com/{repo}")
+                subprocess.call(f"git clone https://github.com/{repo}", shell=True)
             else:
-                os.system(f"git clone https://github.com/{repo} {folder}")
+                subprocess.call(f"git clone https://github.com/{repo} {folder}", shell=True)
 
 
 
@@ -103,25 +90,25 @@ class GTools():
         else:
             script += "&& make install"
 
-        os.system(script)
+        subprocess.call(script, shell=True)
 
     def showFiles(repo):
         repo_get = g.get_repo(f"{repo}")
         try:
             content = repo_get.get_contents("")
-            print(f"{BOLD}Files into {repo}{CLEAR_ALL}")
+            print(f"[bold white]Files into {repo}[/bold white]")
             for x in content:
-                print(f"{BOLD}{BLUE}->{CLEAR_ALL} {x.path}")
+                print(f"[bold blue]{x.path}[/bold blue]")
 
         except:
             print("Ocorreu um erro ao obter os arquivos de `{repo}`")
-            sys.exit()
+            sys.exit(1)
 
     def installModified(repo):
         splited_r = repo.split('/')[1]
         GTools.clone(repo, f'/tmp/{splited_r}')
-        print(f"{BOLD}{RED}\n[WARNING]{CLEAR_FORE} OPENING SHELL INTO `/tmp/{splited_r}`\nAFTER INSTALL, QUIT FROM SHELL TO CONTINUE\n{CLEAR_ALL}")
-        os.system(f"cd /tmp/{splited_r}; {USER_SHELL}")
+        print(f"[bold red]\n[WARNING][/bold red] [bold white]OPENING SHELL INTO `/tmp/{splited_r}`\nAFTER INSTALL, QUIT FROM SHELL TO CONTINUE\n[/bold white]")
+        subprocess.call(f"cd /tmp/{splited_r}; {USER_SHELL}", shell=True)
 
 
     def install_sh(repo):
@@ -129,21 +116,21 @@ class GTools():
         GTools.clone(repo, f"/tmp/{splited_r}")
         
 
-        ras = input(f"{BOLD}Run with SUDO? [N/y] {CLEAR_ALL}")
-        print(f"{BOLD}{GREEN}\n[INFO]{CLEAR_FORE} STARTING INSTALL.SH\n{CLEAR_ALL}")
+        ras = input(f"[bold white]Run with SUDO? [N/y] [/bold white]")
+        print(f"[bold green]\n[INFO][/bold green] [bold white]STARTING INSTALL.SH\n[/bold white]")
 
         if ras.lower().endswith('n') or ras == "":
-            os.system(f"cd /tmp/{splited_r}; sh install.sh")
+            subprocess.call(f"cd /tmp/{splited_r}; sh install.sh", shell=True)
 
         else:
-            os.system(f"cd /tmp/{splited_r}; sudo sh install.sh")
+            subprocess.call(f"cd /tmp/{splited_r}; sudo sh install.sh", shell=True)
 
         
         
 
 class Harpia(object):
     def search(self, *args, all_r=False):
-        print(f"{BOLD}{RED} Searching for: {' '.join(args)} {CLEAR_ALL}")
+        print(f"[bold red] Searching for: {' '.join(args)} [/bold red]")
 
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
         res = g.search_repositories(query, "stars", "desc")
@@ -177,29 +164,29 @@ class Harpia(object):
         '''
         
         for ritem in rlist:
-            print(f"{BOLD}{GREEN}{ritem['owner']}{CLEAR_FORE}/{WHITE}{ritem['repo_name']}{CLEAR_ALL}")
+            print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['repo_name']}[/bold white]")
 
             if len(ritem["description"]) >= 100:
-                print(f"{DIM}\t{str(ritem['description'])[:100]}{CLEAR_ALL}")
+                print(f"[grey]\t{str(ritem['description'])[:100]}[/grey]")
             else:
-                print(f"{DIM}\t{ritem['description']}{CLEAR_ALL}")
+                print(f"[grey]\t{ritem['description']}[/grey]")
 
     def install(self, *args, direct=False):
-        print(f"{BOLD}Installing: {' '.join(args)}{CLEAR_ALL}")
+        print(f"[bold]Installing: {' '.join(args)}[/bold]")
 
         for x in args:
             if "/" in x:
                 if VerificationTools.verify_repo_existence(x) == True:
                     if VerificationTools.has_install_sh(x) == True:
-                        print(f"{BOLD}{GREEN} -> {CLEAR_ALL} This package has install.sh")
+                        print(f"[bold green] -> [/bold green] This package has install.sh")
                         GTools.install_sh(x)
 
                     elif VerificationTools.has_makefile(x):
-                        confirm = input(f"{BOLD}{BLUE} -> {CLEAR_FORE} `install.sh` not found, but `Makefile` exists. Continue? [Y/n] {CLEAR_ALL}")
+                        confirm = input(f"[bold blue] -> [/bold blue] [bold]`install.sh` not found, but `Makefile` exists. Continue? [Y/n] [/bold]")
                         
 
                         if confirm.lower().endswith("y") or confirm == "":
-                            execute_makeinstall = input(f"{BOLD}Execute with `make install`? [N/y] {CLEAR_ALL}")
+                            execute_makeinstall = input(f"[bold]Execute with `make install`? [N/y] [/bold]")
                             if execute_makeinstall.lower().endswith("n") or confirm == "":
                                 makeinstall_tf = False
                             else:
@@ -210,7 +197,7 @@ class Harpia(object):
                         else:
                             if args[-1] == x:
                                 print("Leaving harpia...")
-                                sys.exit()
+                                sys.exit(0)
                             else:
                                 print("Continuating")
                             
@@ -218,7 +205,7 @@ class Harpia(object):
                         
 
                     else:
-                        confirm = input(f"{BOLD}{YELLOW} -> {CLEAR_FORE} This package has not `install.sh`. Continue? [Y/n] {CLEAR_ALL}")
+                        confirm = input(f"[bold yellow] -> [/bold yellow] [bold]This package has not `install.sh`. Continue? [Y/n] [/bold]")
                         if confirm.lower().endswith("y") or confirm == "":
                             print("Okay")
                             GTools.showFiles(x)
@@ -251,7 +238,7 @@ class Harpia(object):
     def justclone(self, *args, dfol='./'):
         for repo in args:
             if "/" in repo:                
-                print(f"\n{BOLD}{GREEN}[INFO]{CLEAR_FORE} trying to clone `{repo}`{CLEAR_ALL}.....")
+                print(f"\n[bold green][INFO][/bold green] [bold]trying to clone `{repo}`[/bold].....")
                 GTools.clone(repo, dfol)
             else:
                 print(f"owner necessary to clone `{repo}`. try to send <owner>/<name>")
