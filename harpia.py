@@ -153,40 +153,31 @@ class GTools():
 
 class Harpia(object):
     def search(self, *args, all_r=False):
-        print(f"[bold red] Searching for: {' '.join(args)} [/bold red]")
-
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
         res = g.search_repositories(query, "stars", "desc")
 
         replist = []
 
-        limit = 10
+        limit = 10 #  TODO: Make it a option in config file
         lcount = 0
 
-        for repo in res:
-            pack = {
-                "repo_name": repo.name,
-                "description": repo.description,
-                "stars": repo.stargazers_count,
-                "owner": repo.owner.login,
-            }
-            if lcount<limit:
-                lcount += 1
-                replist.append(pack)
-            else:
-                break
-
-        rlist = replist
-        '''
-        rlist = []
-
-        if all_r == False:
-            rlist = replist[:limit]
-        else:
-            rlist = replist
-        '''
+        print()
         
-        for ritem in rlist:
+        with console.status(f'[blue]Searching for[/] {" ".join(args)} [blue]packages...'):
+            for repo in res:
+                pack = {
+                    "repo_name": repo.name,
+                    "description": repo.description,
+                    "stars": repo.stargazers_count,
+                    "owner": repo.owner.login,
+                }
+                if lcount<limit:
+                    lcount += 1
+                    replist.append(pack)
+                else:
+                    break
+
+        for ritem in replist:
             print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['repo_name']}[/bold white]")
 
             if len(ritem["description"]) >= 100:
