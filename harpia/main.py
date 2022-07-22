@@ -34,7 +34,6 @@ def touchConfigFile() -> None:
     token_sample: str = pkg_resources.read_text(templates, 'token.ini')
     os.mkdir(f'{USER_HOME}/.config/harpia')
 
-    console.log(token_sample)
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
         config_file.write('[token]\ntoken=')
 
