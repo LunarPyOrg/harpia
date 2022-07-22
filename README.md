@@ -16,7 +16,7 @@ cd harpia
 pip install .
 ```
 
-Build and install (install poetry with `pip install poetry` first):
+Build and install (you'll need to install [poetry](https://python-poetry.org/docs/#installation) first):
 
 ```shell
 git clone https://github.com/LunarPyOrg/harpia # Will clone 'main' branch
