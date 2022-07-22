@@ -1,3 +1,6 @@
+import importlib.resources as pkg_resources
+from . import templates
+
 import fire
 import os
 import sys
@@ -28,7 +31,10 @@ def errorAccessToken() -> None:
 #  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
 
 def touchConfigFile() -> None:
+    token_sample: str = pkg_resources.read_text(templates, 'token.ini')
     os.mkdir(f'{USER_HOME}/.config/harpia')
+
+    console.log(token_sample)
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
         config_file.write('[token]\ntoken=')
 
