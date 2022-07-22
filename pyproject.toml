@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "harpia"
+version = "0.1.0"
+description = "Harpia é um instalador feito em Python, foca principalmente em repositórios do Github"
+authors = ["hayukimori <hayukimori@gmail.com>"]
+license = "BSD-3-Clause"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fire = "^0.4.0"
+rich = "^12.5.1"
+PyGithub = "^1.55"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+harpia = "harpia.main:main"
