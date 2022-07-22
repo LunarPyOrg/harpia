@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+import importlib.resources as pkg_resources
+from . import templates
 
 import fire
 import os
@@ -30,6 +31,9 @@ def errorAccessToken() -> None:
 #  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
 
 def touchConfigFile() -> None:
+    token_sample: str = pkg_resources.read_text(templates, 'token.ini')
+    os.mkdir(f'{USER_HOME}/.config/harpia')
+
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
         config_file.write('[token]\ntoken=')
 
@@ -260,7 +264,9 @@ class Harpia(object):
                 print(f"owner necessary to clone `{repo}`. try to send <owner>/<name>")
 
 
+def main() -> None:
+    fire.Fire(Harpia)
+
 
 if __name__ == "__main__":
-
-    fire.Fire(Harpia)
+    main()
