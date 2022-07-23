@@ -43,8 +43,19 @@ if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
     console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
     touchConfigFile()
 
+<<<<<<< HEAD:harpia/main.py
 parser = ConfigParser()
 parser.read(f"{USER_HOME}/.config/harpia/token.ini")
+=======
+else:
+    if os.path.exists('./token.ini') == True:
+        parser = ConfigParser()
+        parser.read('./token.ini')
+
+    else:
+        print("couldn't find `token.ini`")
+        sys.exit(1)
+>>>>>>> main:harpia.py
 
 
 github_token = parser.get('token', 'token')
@@ -157,6 +168,11 @@ class GTools():
 
 class Harpia(object):
     def search(self, *args, all_r=False):
+<<<<<<< HEAD:harpia/main.py
+=======
+        print(f"[bold red] Searching for: {' '.join(args)} [/bold red]")
+
+>>>>>>> main:harpia.py
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
         res = g.search_repositories(query, "stars", "desc")
 
@@ -167,6 +183,7 @@ class Harpia(object):
 
         print()
         
+<<<<<<< HEAD:harpia/main.py
         with console.status(f'[blue]Searching for[/] {" ".join(args)} [blue]packages...'):
             for repo in res:
                 pack = {
@@ -182,6 +199,9 @@ class Harpia(object):
                     break
 
         for ritem in replist:
+=======
+        for ritem in rlist:
+>>>>>>> main:harpia.py
             print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['repo_name']}[/bold white]")
 
             if len(ritem["description"]) >= 100:
