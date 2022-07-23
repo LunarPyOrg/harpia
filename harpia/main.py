@@ -18,9 +18,9 @@ USER_HOME = os.environ['HOME']
 console: Console = Console()
 install()
 
-parser: ConfigParser
+parser: ConfigParser = ConfigParser()
 github_token: str
-search_limit: str
+search_limit: int
 github: Github
 
 
@@ -162,31 +162,25 @@ class GTools():
 class Harpia(object):
     def search(self, *args, all_r=False):
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
-        res = github.search_repositories(query, "stars", "desc")
+        repo_list = []
 
-        replist = []
-
-        limit = 10 #  TODO: Make it a option in config file
-        lcount = 0
-
-        print()
-        
         with console.status(f'[blue]Searching for[/] {" ".join(args)} [blue]packages...'):
-            for repo in res:
-                pack = {
-                    "repo_name": repo.name,
-                    "description": repo.description,
-                    "stars": repo.stargazers_count,
-                    "owner": repo.owner.login,
-                }
-                if lcount<limit:
-                    lcount += 1
-                    replist.append(pack)
-                else:
-                    break
+            gh_response = github.search_repositories(query, "stars", "desc")
 
-        for ritem in replist:
-            print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['repo_name']}[/bold white]")
+            for i in range(search_limit):
+                repo = gh_response[i]
+
+                pack = {
+                    'name':         repo.name,
+                    'description':  repo.description,
+                    'stars':        repo.stargazers_count,
+                    'owner':        repo.owner.login,
+                }
+
+                repo_list.append(pack)
+
+        for ritem in repo_list:
+            print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['name']}[/bold white]")
 
             if len(ritem["description"]) >= 100:
                 print(f"[grey]\t{str(ritem['description'])[:100]}[/grey]")
@@ -269,7 +263,6 @@ class Harpia(object):
 
 
 def main() -> None:
-    global parser
     global github_token
     global search_limit
     global github
@@ -280,16 +273,17 @@ def main() -> None:
         console.print('[black on green] PROC [/] :: Creating the config file...', style='green')
         touch_config_file()
 
-    parser = ConfigParser()
     parser.read(f"{USER_HOME}/.config/harpia/token.ini")
 
     github_token = get_config_value('token', 'token')
-    search_limit = get_config_value('search', 'limit')
+    search_limit = int(get_config_value('search', 'limit'))
 
     if not (github_token and search_limit):
         error_option_missing()
 
     github = Github(github_token)
+
+    print() # Print an empty line for astetic reasons...
     fire.Fire(Harpia)
 
 
