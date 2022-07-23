@@ -8,7 +8,7 @@ import subprocess
 from github import Github
 from configparser import ConfigParser
 
-from rich import print
+from rich import print, inspect
 from rich.console import Console
 from rich.traceback import install
 
@@ -162,30 +162,25 @@ class GTools():
 class Harpia(object):
     def search(self, *args, all_r=False):
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
-        repo_list = []
 
         with console.status(f'[blue]Searching for[/] {" ".join(args)} [blue]packages...'):
             gh_response = github.search_repositories(query, "stars", "desc")
 
             for i in range(search_limit):
-                repo = gh_response[i]
+                try:
+                    repo = gh_response[i]
+                except:
+                    break
 
-                pack = {
-                    'name':         repo.name,
-                    'description':  repo.description,
-                    'stars':        repo.stargazers_count,
-                    'owner':        repo.owner.login,
-                }
+                console.print('[bold italic blue]+[/] [bold green]{}/[white]{}[/] [blue]==>[/] [yellow]Stars: {} {} {}'
+                    .format(repo.owner.login, repo.name, repo.stargazers_count,
+                        '[black on yellow] FORKED [/]' if repo.fork else '',
+                        '[black on cyan] PAGES [/]' if repo.has_pages else ''),
+                    highlight=False)
 
-                repo_list.append(pack)
+                console.print(f'{repo.description[:250]} [black italic][...]\n',
+                    style='grey82', highlight=False)
 
-        for ritem in repo_list:
-            print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['name']}[/bold white]")
-
-            if len(ritem["description"]) >= 100:
-                print(f"[grey]\t{str(ritem['description'])[:100]}[/grey]")
-            else:
-                print(f"[grey]\t{ritem['description']}[/grey]")
 
     def install(self, *args, direct=False):
         print(f"[bold]Installing: {' '.join(args)}[/bold]")
