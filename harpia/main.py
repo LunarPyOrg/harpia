@@ -26,7 +26,7 @@ github: Github
 #  NOTE: Just show a pretty error message, and help instructions, and interupt the code execution
 
 def error_access_token() -> None:
-    console.print('\n[black on yellow] WARN [/] :: You need to specify an github access token on the config file!', style='red')
+    console.print('\n[black on yellow] WARN [/] :: You need to specify an github access token on the config file!', style='yellow')
     console.print('[black on cyan] INFO [/] :: Add the token in [underline]~/.config/harpia/token.ini[/] file', style='cyan')
 
     console.print('\nMore info on [bold italic underline]harpia documentation[/], if you want to gen your github')
@@ -38,11 +38,11 @@ def error_access_token() -> None:
 #  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
 
 def touch_config_file() -> None:
-    token_sample: str = pkg_resources.read_text(templates, 'token.ini')
+    config_template: str = pkg_resources.read_text(templates, 'token.ini')
     os.mkdir(f'{USER_HOME}/.config/harpia')
 
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
-        config_file.write('[token]\ntoken=')
+        config_file.write(config_template)
 
 
 class VerificationTools():
@@ -259,7 +259,7 @@ def main() -> None:
     # Parser automation
     if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
         console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
-        console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
+        console.print('[black on green] PROC [/] :: Creating the config file...', style='green')
         touch_config_file()
 
     parser = ConfigParser()
