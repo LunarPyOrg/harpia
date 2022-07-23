@@ -16,22 +16,24 @@ USER_SHELL = os.environ['SHELL']
 USER_HOME = os.environ['HOME']
 
 console: Console = Console()
-install(show_locals=True)
+install()
 
 parser: ConfigParser
 github_token: str
+search_limit: str
 github: Github
 
 
 #  NOTE: Just show a pretty error message, and help instructions, and interupt the code execution
 
-def error_access_token() -> None:
+def error_option_missing() -> None:
     console.print('\n[black on yellow] WARN [/] :: You need to specify an github access token on the config file!', style='yellow')
     console.print('[black on cyan] INFO [/] :: Add the token in [underline]~/.config/harpia/token.ini[/] file', style='cyan')
 
     console.print('\nMore info on [bold italic underline]harpia documentation[/], if you want to gen your github')
     console.print('access token, see the [bold italic underline]Github Docs[/] page about that.')
 
+    console.print('\n\n[red]ValueMissing:[/] Some value inf config file was missing')
     sys.exit(1)
 
 
@@ -43,6 +45,19 @@ def touch_config_file() -> None:
 
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
         config_file.write(config_template)
+
+
+#  NOTE: Protected way to import the config option (show an error if a option is missing)
+
+def get_config_value(key: str, option: str) -> str:
+    try:
+        response: str = parser.get(key, option)
+
+    except Exception as err:
+        console.print_exception()
+        raise err
+
+    return response
 
 
 class VerificationTools():
@@ -254,7 +269,10 @@ class Harpia(object):
 
 
 def main() -> None:
-    global parser, github_token, github
+    global parser
+    global github_token
+    global search_limit
+    global github
 
     # Parser automation
     if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
@@ -265,10 +283,11 @@ def main() -> None:
     parser = ConfigParser()
     parser.read(f"{USER_HOME}/.config/harpia/token.ini")
 
-    github_token = parser.get('token', 'token')
+    github_token = get_config_value('token', 'token')
+    search_limit = get_config_value('search', 'limit')
 
-    if not github_token:
-        error_access_token()
+    if not (github_token and search_limit):
+        error_option_missing()
 
     github = Github(github_token)
     fire.Fire(Harpia)
