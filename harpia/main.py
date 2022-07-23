@@ -7,14 +7,21 @@ import sys
 import subprocess
 from github import Github
 from configparser import ConfigParser
+
 from rich import print
 from rich.console import Console
+from rich.traceback import install
 
-#GLOBAL
 USER_SHELL = os.environ['SHELL']
 USER_HOME = os.environ['HOME']
 
 console: Console = Console()
+install(show_locals=True)
+
+parser: ConfigParser
+github_token: str
+github: Github
+
 
 #  NOTE: Just show a pretty error message, and help instructions, and interupt the code execution
 
@@ -37,29 +44,11 @@ def touchConfigFile() -> None:
     with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
         config_file.write('[token]\ntoken=')
 
-# Parser automation
-if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
-    console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
-    console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
-    touchConfigFile()
-
-
-parser = ConfigParser()
-parser.read(f"{USER_HOME}/.config/harpia/token.ini")
-
-github_token = parser.get('token', 'token')
-
-if not github_token:
-    errorAccessToken()
-
-g = Github(github_token)
-
-
 
 class VerificationTools():
 
     def has_install_sh(repo_lnk) -> bool:
-        rep = g.get_repo(f"{repo_lnk}")
+        rep = github.get_repo(f"{repo_lnk}")
 
         try:
             content = rep.get_contents("install.sh")
@@ -71,14 +60,14 @@ class VerificationTools():
 
     def verify_repo_existence(repo_lnk) -> bool:
         try:
-            rep = g.get_repo(repo_lnk)
+            rep = github.get_repo(repo_lnk)
             return True
         except:
             return False
 
 
     def has_makefile(repo_lnk) -> bool:
-        rep = g.get_repo(f"{repo_lnk}")
+        rep = github.get_repo(f"{repo_lnk}")
         try:
             content = rep.get_contents("Makefile")
             return True
@@ -119,7 +108,7 @@ class GTools():
         subprocess.call(script, shell=True)
 
     def showFiles(repo):
-        repo_get = g.get_repo(f"{repo}")
+        repo_get = github.get_repo(f"{repo}")
         try:
             content = repo_get.get_contents("")
             print(f"[bold white]Files into {repo}[/bold white]")
@@ -158,7 +147,7 @@ class GTools():
 class Harpia(object):
     def search(self, *args, all_r=False):
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
-        res = g.search_repositories(query, "stars", "desc")
+        res = github.search_repositories(query, "stars", "desc")
 
         replist = []
 
@@ -265,6 +254,23 @@ class Harpia(object):
 
 
 def main() -> None:
+    global parser, github_token, github
+
+    # Parser automation
+    if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
+        console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
+        console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
+        touchConfigFile()
+
+    parser = ConfigParser()
+    parser.read(f"{USER_HOME}/.config/harpia/token.ini")
+
+    github_token = parser.get('token', 'token')
+
+    if not github_token:
+        errorAccessToken()
+
+    github = Github(github_token)
     fire.Fire(Harpia)
 
 
