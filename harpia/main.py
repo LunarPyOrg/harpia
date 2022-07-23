@@ -1,3 +1,6 @@
+import importlib.resources as pkg_resources
+from . import templates
+
 import fire
 import os
 import sys
@@ -11,11 +14,39 @@ from rich.console import Console
 USER_SHELL = os.environ['SHELL']
 USER_HOME = os.environ['HOME']
 
-# Parser automation
-if os.path.exists(f'{USER_HOME}/.config/harpia/token.ini') == True:    
-    parser = ConfigParser()
-    parser.read(f"{USER_HOME}/.config/harpia/token.ini")
+console: Console = Console()
 
+#  NOTE: Just show a pretty error message, and help instructions, and interupt the code execution
+
+def errorAccessToken() -> None:
+    console.print('\n[black on red] ERROR [/] :: You need to specify an github access token on the config file!', style='red')
+    console.print('[black on cyan] INFO [/] :: Add the token in [underline]~/.config/harpia/token.ini[/] file', style='cyan')
+
+    console.print('\nMore info on [bold italic underline]harpia documentation[/], if you want to gen your github')
+    console.print('access token, see the [bold italic underline]Github Docs[/] page about that.')
+
+    sys.exit(1)
+
+
+#  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
+
+def touchConfigFile() -> None:
+    token_sample: str = pkg_resources.read_text(templates, 'token.ini')
+    os.mkdir(f'{USER_HOME}/.config/harpia')
+
+    with open(f'{USER_HOME}/.config/harpia/token.ini', 'w') as config_file:
+        config_file.write('[token]\ntoken=')
+
+# Parser automation
+if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
+    console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
+    console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
+    touchConfigFile()
+
+<<<<<<< HEAD:harpia/main.py
+parser = ConfigParser()
+parser.read(f"{USER_HOME}/.config/harpia/token.ini")
+=======
 else:
     if os.path.exists('./token.ini') == True:
         parser = ConfigParser()
@@ -24,9 +55,14 @@ else:
     else:
         print("couldn't find `token.ini`")
         sys.exit(1)
+>>>>>>> main:harpia.py
 
 
 github_token = parser.get('token', 'token')
+
+if not github_token:
+    errorAccessToken()
+
 g = Github(github_token)
 
 
@@ -132,40 +168,40 @@ class GTools():
 
 class Harpia(object):
     def search(self, *args, all_r=False):
+<<<<<<< HEAD:harpia/main.py
+=======
         print(f"[bold red] Searching for: {' '.join(args)} [/bold red]")
 
+>>>>>>> main:harpia.py
         query = "+".join(args) + "+in:name+in:owner/name+in:readme+in:description"
         res = g.search_repositories(query, "stars", "desc")
 
         replist = []
 
-        limit = 10
+        limit = 10 #  TODO: Make it a option in config file
         lcount = 0
 
-        for repo in res:
-            pack = {
-                "repo_name": repo.name,
-                "description": repo.description,
-                "stars": repo.stargazers_count,
-                "owner": repo.owner.login,
-            }
-            if lcount<limit:
-                lcount += 1
-                replist.append(pack)
-            else:
-                break
-
-        rlist = replist
-        '''
-        rlist = []
-
-        if all_r == False:
-            rlist = replist[:limit]
-        else:
-            rlist = replist
-        '''
+        print()
         
+<<<<<<< HEAD:harpia/main.py
+        with console.status(f'[blue]Searching for[/] {" ".join(args)} [blue]packages...'):
+            for repo in res:
+                pack = {
+                    "repo_name": repo.name,
+                    "description": repo.description,
+                    "stars": repo.stargazers_count,
+                    "owner": repo.owner.login,
+                }
+                if lcount<limit:
+                    lcount += 1
+                    replist.append(pack)
+                else:
+                    break
+
+        for ritem in replist:
+=======
         for ritem in rlist:
+>>>>>>> main:harpia.py
             print(f"[bold green]{ritem['owner']}[/bold green]/[bold white]{ritem['repo_name']}[/bold white]")
 
             if len(ritem["description"]) >= 100:
@@ -248,7 +284,9 @@ class Harpia(object):
                 print(f"owner necessary to clone `{repo}`. try to send <owner>/<name>")
 
 
+def main() -> None:
+    fire.Fire(Harpia)
+
 
 if __name__ == "__main__":
-
-    fire.Fire(Harpia)
+    main()
