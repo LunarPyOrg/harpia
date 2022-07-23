@@ -25,8 +25,8 @@ github: Github
 
 #  NOTE: Just show a pretty error message, and help instructions, and interupt the code execution
 
-def errorAccessToken() -> None:
-    console.print('\n[black on red] ERROR [/] :: You need to specify an github access token on the config file!', style='red')
+def error_access_token() -> None:
+    console.print('\n[black on yellow] WARN [/] :: You need to specify an github access token on the config file!', style='red')
     console.print('[black on cyan] INFO [/] :: Add the token in [underline]~/.config/harpia/token.ini[/] file', style='cyan')
 
     console.print('\nMore info on [bold italic underline]harpia documentation[/], if you want to gen your github')
@@ -37,7 +37,7 @@ def errorAccessToken() -> None:
 
 #  NOTE: Function write (touch if it does't exits) a empty token option on config file paht
 
-def touchConfigFile() -> None:
+def touch_config_file() -> None:
     token_sample: str = pkg_resources.read_text(templates, 'token.ini')
     os.mkdir(f'{USER_HOME}/.config/harpia')
 
@@ -260,7 +260,7 @@ def main() -> None:
     if not os.path.exists(f'{USER_HOME}/.config/harpia/token.ini'):
         console.print('\n[black on yellow] WARN [/] :: The config file [underline]~/.config/harpia/token.ini[/] was not found!', style='yellow')
         console.print('[black on cyan] INFO [/] :: Creating the config file', style='cyan')
-        touchConfigFile()
+        touch_config_file()
 
     parser = ConfigParser()
     parser.read(f"{USER_HOME}/.config/harpia/token.ini")
@@ -268,7 +268,7 @@ def main() -> None:
     github_token = parser.get('token', 'token')
 
     if not github_token:
-        errorAccessToken()
+        error_access_token()
 
     github = Github(github_token)
     fire.Fire(Harpia)
